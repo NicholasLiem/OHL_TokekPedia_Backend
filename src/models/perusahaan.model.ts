@@ -3,8 +3,8 @@ import { Barang } from './barang.model';
 
 @Entity()
 export class Perusahaan {
-  @PrimaryGeneratedColumn()
-  id!: number;
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
 
   @Column()
   nama: string;

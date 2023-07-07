@@ -1,12 +1,14 @@
 import { Express } from 'express';
 import { DataSource } from 'typeorm';
-import { createBarang, getBarang, updateBarang } from './controller/barang.controller';
+import { createBarang, getBarang, updateBarang, deleteBarangById } from './controller/barang.controller';
 import { createPerusahaan } from './controller/perusahaan.controller';
 
 function routes(app: Express, db: DataSource) {
   app.get('/self', (req, res) => {
     res.sendStatus(200);
   });
+
+  // Route for login
 
   // Route for managing barang
   app.post('/barang', (req, res) => {
@@ -21,7 +23,17 @@ function routes(app: Express, db: DataSource) {
     updateBarang(req, res, db);
   });
 
+  app.get('/barang/', (req, res) => {
+    // getBarangByQuery(req, res, db);
+  });
 
+  app.delete('/barang/:id', (req, res) => {
+    deleteBarangById(req, res, db);
+  });
+
+
+
+  // Route for managing perusahaan
   app.post('/perusahaan', (req, res) => {
     createPerusahaan(req, res, db);
   });
