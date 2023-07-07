@@ -2,6 +2,7 @@ import { Express } from 'express';
 import { DataSource } from 'typeorm';
 import { createBarang, getBarang, updateBarang, deleteBarangById } from './controller/barang.controller';
 import { createPerusahaan, getPerusahaanById, updatePerusahaan, deletePerusahaanById } from './controller/perusahaan.controller';
+import { register, login } from './controller/user.controller';
 
 function routes(app: Express, db: DataSource) {
   app.get('/self', (req, res) => {
@@ -9,6 +10,13 @@ function routes(app: Express, db: DataSource) {
   });
 
   // Route for login
+  app.post('/register', (req, res) => {
+    register(req, res, db);
+  });
+
+  app.post('/login', (req, res) => {
+    login(req, res, db);
+  });
 
   // Route for managing barang
   app.post('/barang', (req, res) => {
