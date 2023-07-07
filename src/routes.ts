@@ -1,6 +1,6 @@
 import { Express } from 'express';
 import { DataSource } from 'typeorm';
-import { createBarang, getBarang } from './controller/barang.controller';
+import { createBarang, getBarang, updateBarang } from './controller/barang.controller';
 import { createPerusahaan } from './controller/perusahaan.controller';
 
 function routes(app: Express, db: DataSource) {
@@ -16,6 +16,11 @@ function routes(app: Express, db: DataSource) {
   app.get('/barang/:id', (req, res) => {
     getBarang(req, res, db);
   });
+
+  app.put('/barang/:id', (req, res) => {
+    updateBarang(req, res, db);
+  });
+
 
   app.post('/perusahaan', (req, res) => {
     createPerusahaan(req, res, db);
