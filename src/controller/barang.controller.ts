@@ -1,41 +1,8 @@
 import { Request, Response } from 'express'
 import { Barang } from '../models/barang.model'
 import { Perusahaan } from '../models/perusahaan.model'
-import { DataSource, FindOperator, ILike } from 'typeorm';
-
-// Utils
-const findBarangById = async (id: string, db: DataSource) => {
-    try {
-        const barangEntity = await db.manager.findOne(Barang, { where: { id: id }, relations: ['perusahaan'] })
-        return barangEntity
-    } catch (error) {
-        console.error('Failed to find Barang by id:', error)
-        return null;
-    }
-}
-
-const findPerusahaanById = async (id: string, db: DataSource) => {
-
-    try {
-        const perusahaanEntity = await db.manager.findOne(Perusahaan, { where: { id: id } })
-        return perusahaanEntity
-    } catch (error) {
-        console.error('Failed to find Perusahaan by id:', error)
-        return null
-    }
-}
-
-const findPerusahaanByName = async (nama: string, db: DataSource) => {
-    try {
-        const perusahaanEntity = await db.manager.findOne(Perusahaan, { where: { nama: nama } })
-        return perusahaanEntity
-    } catch (error) {
-        console.error('Failed to find Perusahaan by nama:', error)
-        return null
-    }
-}
-
-// Main functions
+import { DataSource } from 'typeorm';
+import { findBarangById, findPerusahaanById } from '../utils/controller.utils';
 
 export const createBarang = async (req: Request, res: Response, db: DataSource) => {
     const { nama, harga, stok, perusahaan_id, kode } = req.body
@@ -238,6 +205,21 @@ export const updateBarang = async (req: Request, res: Response, db: DataSource) 
               perusahaan_id: perusahaan_id
             }
           })
+      }
+
+      if (nama == null || harga == null || stok == null || kode == null) {
+        return res.status(400).json({
+          status: 'error',
+          message: 'Every Barang data must not be empty',
+          data: {
+            id: id,
+            nama: nama,
+            harga: harga,
+            stok: stok,
+            kode: kode,
+            perusahaan_id: perusahaan_id
+          }
+        })
       }
       
       barangEntity.nama = nama;

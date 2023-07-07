@@ -18,7 +18,7 @@ export class Perusahaan {
   @Column()
   kode: string
 
-  @OneToMany(() => Barang, barang => barang.perusahaan)
+  @OneToMany(() => Barang, barang => barang.perusahaan, {cascade: true})
   barangs: Barang[] | undefined;
 
   constructor(nama: string, no_telp: string, kode:string, alamat: string) {

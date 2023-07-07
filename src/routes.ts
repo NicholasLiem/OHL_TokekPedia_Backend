@@ -1,7 +1,7 @@
 import { Express } from 'express';
 import { DataSource } from 'typeorm';
 import { createBarang, getBarang, updateBarang, deleteBarangById } from './controller/barang.controller';
-import { createPerusahaan } from './controller/perusahaan.controller';
+import { createPerusahaan, getPerusahaanById, updatePerusahaan, deletePerusahaanById } from './controller/perusahaan.controller';
 
 function routes(app: Express, db: DataSource) {
   app.get('/self', (req, res) => {
@@ -36,6 +36,18 @@ function routes(app: Express, db: DataSource) {
   // Route for managing perusahaan
   app.post('/perusahaan', (req, res) => {
     createPerusahaan(req, res, db);
+  });
+
+  app.get('/perusahaan/:id', (req, res) => {
+    getPerusahaanById(req, res, db);
+  });
+
+  app.put('/perusahaan/:id', (req, res) => {
+    updatePerusahaan(req, res, db);
+  });
+
+  app.delete('/perusahaan/:id', (req, res) => {
+    deletePerusahaanById(req, res, db);
   });
 
   /* Nonexisting Route handling */
