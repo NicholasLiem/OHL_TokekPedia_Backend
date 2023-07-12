@@ -1,2 +1,3 @@
 /config/default.ts
 node_modules/
+*.log

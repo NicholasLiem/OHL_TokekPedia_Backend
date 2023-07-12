@@ -1,7 +1,7 @@
 import { Express } from 'express';
 import { DataSource } from 'typeorm';
-import { createBarang, getBarang, updateBarang, deleteBarangById } from './controller/barang.controller';
-import { createPerusahaan, getPerusahaanById, updatePerusahaan, deletePerusahaanById } from './controller/perusahaan.controller';
+import { createBarang, getBarang, updateBarang, deleteBarangById, searchBarang } from './controller/barang.controller';
+import { createPerusahaan, getPerusahaanById, updatePerusahaan, deletePerusahaanById, searchPerusahaan } from './controller/perusahaan.controller';
 import { register, login } from './controller/user.controller';
 
 function routes(app: Express, db: DataSource) {
@@ -23,16 +23,16 @@ function routes(app: Express, db: DataSource) {
     createBarang(req, res, db);
   });
 
+  app.get('/barang', (req, res) => {
+    searchBarang(req, res, db);
+  });
+
   app.get('/barang/:id', (req, res) => {
     getBarang(req, res, db);
   });
 
   app.put('/barang/:id', (req, res) => {
     updateBarang(req, res, db);
-  });
-
-  app.get('/barang/', (req, res) => {
-    // getBarangByQuery(req, res, db);
   });
 
   app.delete('/barang/:id', (req, res) => {
@@ -44,6 +44,10 @@ function routes(app: Express, db: DataSource) {
   // Route for managing perusahaan
   app.post('/perusahaan', (req, res) => {
     createPerusahaan(req, res, db);
+  });
+
+  app.get('/perusahaan', (req, res) => {
+    searchPerusahaan(req, res, db);
   });
 
   app.get('/perusahaan/:id', (req, res) => {

@@ -1,0 +1,9 @@
+FROM postgres:latest
+
+ENV POSTGRES_USER=niko
+ENV POSTGRES_PASSWORD=niko
+ENV POSTGRES_DB=databarang
+
+EXPOSE 5432
+
+CMD ["postgres"]

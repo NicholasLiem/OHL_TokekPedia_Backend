@@ -3,6 +3,7 @@ import { Perusahaan } from '../models/perusahaan.model';
 import { Barang } from '../models/barang.model';
 import { DataSource } from 'typeorm';
 import { findPerusahaanById } from '../utils/controller.utils';
+import { ResponseUtil } from '../utils/response.utils';
 
 function isCapitalThreeLetterString(str: string): boolean {
   const regex = /^[A-Z]{3}$/;
@@ -12,62 +13,50 @@ function isCapitalThreeLetterString(str: string): boolean {
 export const createPerusahaan = async (req: Request, res: Response, db: DataSource) => {
   const { nama, alamat, no_telp, kode } = req.body
   try {
-    const existingPerusahaanByKode = await db.manager.findOne(Perusahaan, { where: { kode: kode } });
-    if (existingPerusahaanByKode) {
-      return res.status(400).json({
-        status: 'error',
-        error: 'Perusahaan with the same kode already exists',
-        data: {
-          id: existingPerusahaanByKode.id,
-          nama: existingPerusahaanByKode.nama,
-          alamat: existingPerusahaanByKode.alamat,
-          no_telp: existingPerusahaanByKode.no_telp,
-          kode: existingPerusahaanByKode.kode
-        }
-      })
-    }
 
-    const perusahaan = new Perusahaan(nama, no_telp, kode, alamat);
-    if (!isCapitalThreeLetterString(kode)) {
-        return res.status(400).json({
-            status: 'error',
-            error: 'Kode perusahaan has to be a three capital letter string',
-            data: {
-                id: null,
-                nama: perusahaan.nama,
-                alamat: perusahaan.alamat,
-                no_telp: perusahaan.no_telp,
-                kode: perusahaan.kode
-            }
-        })
-    }
+    const existingPerusahaanByKode = await db.manager.findOne(Perusahaan, { where: { kode: kode } })
+
+    if (existingPerusahaanByKode)
+      return ResponseUtil.sendError(res, 400, 'Perusahaan with the same kode already exists', existingPerusahaanByKode)
+
+    const perusahaan = new Perusahaan(nama, no_telp, kode, alamat)
+
+    if (!isCapitalThreeLetterString(kode))
+      return ResponseUtil.sendError(res, 400, 'Kode must be a 3 capital letter string', perusahaan)
+    
     
     await db.manager.save(perusahaan);
 
-    res.status(201).json({
-      status: 'success',
-      message: 'Perusahaan created successfully',
-      data: {
-        id: perusahaan.id,
-        nama: perusahaan.nama,
-        alamat: perusahaan.alamat,
-        no_telp: perusahaan.no_telp,
-        kode: perusahaan.kode
-      }
-    })
+    return ResponseUtil.sendResponse(res, 201, 'Perusahaan created successfully', perusahaan)
+
   } catch (error) {
-    console.error('Failed to create Perusahaan:', error);
-    res.status(500).json({
-      status: 'error',
-      error: 'Failed to create Perusahaan',
-      data: {
-        id: null,
-        nama: nama,
-        alamat: alamat,
-        no_telp: no_telp,
-        kode: kode
-      }
-    })
+
+    return ResponseUtil.sendError(res, 500, 'Failed to create Perusahaan', req.body)
+  }
+}
+
+export const searchPerusahaan = async (req: Request, res: Response, db: DataSource) => {
+  const { q } = req.query
+  try {
+    const perusahaanRepository = db.getRepository(Perusahaan)
+    const searchString = q?.toString()
+
+    if (!q)
+      return ResponseUtil.sendError(res, 400, 'Search query is empty', req.query)
+
+    var perusahaanData = await perusahaanRepository
+                      .createQueryBuilder('perusahaan')
+                      .where('perusahaan.nama LIKE :searchString OR perusahaan.kode LIKE :searchString', {searchString: `%${searchString}%`})
+                      .getMany()
+
+    if (perusahaanData.length == 0)
+      return ResponseUtil.sendError(res, 404, 'Perusahaan not found', req.query)
+
+    return ResponseUtil.sendResponse(res, 200, 'Perusahaan found', perusahaanData)
+
+  } catch (error) {
+
+    return ResponseUtil.sendError(res, 500, 'Failed to search Perusahaan', req.query)
   }
 }
 
@@ -75,43 +64,14 @@ export const getPerusahaanById = async (req: Request, res: Response, db: DataSou
   const { id } = req.params
   try {
     const perusahaanEntity = await findPerusahaanById(id, db)
-    if (perusahaanEntity == null){
-      return res.status(404).json({
-        status: 'error',
-        message: 'Perusahaan not found',
-        data: {
-          id: id,
-          nama: null,
-          alamat: null,
-          no_telp: null,
-          kode: null
-        }
-      })
-    }
+    if (perusahaanEntity == null)
+      return ResponseUtil.sendError(res, 404, 'Perusahaan not found', req.params)
 
-    return res.status(200).json({
-      status: 'success',
-      message: 'Perusahaan found',
-      data: {
-        id: perusahaanEntity.id,
-        nama: perusahaanEntity.nama,
-        alamat: perusahaanEntity.alamat,
-        no_telp: perusahaanEntity.no_telp,
-        kode: perusahaanEntity.kode
-      }
-    })
+    return ResponseUtil.sendResponse(res, 200, 'Perusahaan found', perusahaanEntity)
+
   } catch(error){ 
-    return res.status(500).json({
-      status: 'error',
-      message: 'Failed to get Perusahaan by id',
-      data: {
-        id: id,
-        nama: null,
-        alamat: null,
-        no_telp: null,
-        kode: null
-      }
-    })
+
+    return ResponseUtil.sendError(res, 500, 'Failed to get Perusahaan by id', req.params)
   }
 }
 
@@ -119,34 +79,12 @@ export const updatePerusahaan = async (req: Request, res: Response, db: DataSour
   const { id } = req.params
   try{
     const perusahaanEntity = await findPerusahaanById(id, db)
-    if (perusahaanEntity == null){
-      return res.status(404).json({
-        status: 'error',
-        message: 'Perusahaan not found',
-        data: {
-          id: id,
-          nama: null,
-          alamat: null,
-          no_telp: null,
-          kode: null
-        }
-      })
-    }
+    if (perusahaanEntity == null)
+      return ResponseUtil.sendError(res, 404, 'Perusahaan not found', req.params)
 
     const { nama, alamat, no_telp, kode } = req.body
-    if (nama == null || alamat == null || no_telp == null || kode == null){
-      return res.status(400).json({
-        status: 'error',
-        message: 'Every Perusahaan data must not be empty',
-        data: {
-          id: id,
-          nama: nama,
-          alamat: alamat,
-          no_telp: no_telp,
-          kode: kode
-        }
-      })
-    }
+    if (nama == null || alamat == null || no_telp == null || kode == null)
+      return ResponseUtil.sendError(res, 400, 'Request body is incomplete', req.body)
 
     perusahaanEntity.nama = nama
     perusahaanEntity.alamat = alamat
@@ -154,30 +92,12 @@ export const updatePerusahaan = async (req: Request, res: Response, db: DataSour
     perusahaanEntity.kode = kode
 
     await db.manager.save(perusahaanEntity)
-    return res.status(200).json({
-      status: 'success',
-      message: 'Perusahaan updated successfully',
-      data: {
-        id: perusahaanEntity.id,
-        nama: perusahaanEntity.nama,
-        alamat: perusahaanEntity.alamat,
-        no_telp: perusahaanEntity.no_telp,
-        kode: perusahaanEntity.kode
-      }
-    })
+
+    return ResponseUtil.sendResponse(res, 200, 'Perusahaan updated successfully', perusahaanEntity)
 
   } catch(error) {
-    return res.status(500).json({
-      status: 'error',
-      message: 'Failed to update Perusahaan',
-      data: {
-        id: id,
-        nama: null,
-        alamat: null,
-        no_telp: null,
-        kode: null
-      }
-    })
+      
+    return ResponseUtil.sendError(res, 500, 'Failed to update Perusahaan', req.params)
   }
 }
 
@@ -185,43 +105,15 @@ export const deletePerusahaanById = async (req: Request, res: Response, db: Data
   const {id} = req.params
   try {
     const perusahaanEntity = await findPerusahaanById(id, db)
-    if (perusahaanEntity == null){
-      return res.status(404).json({
-        status: 'error',
-        message: 'Perusahaan not found',
-        data: {
-          id: id,
-          nama: null,
-          alamat: null,
-          no_telp: null,
-          kode: null
-        }
-      })
-    }
+    if (perusahaanEntity == null)
+      return ResponseUtil.sendError(res, 404, 'Perusahaan not found', req.params)
+    
     await db.manager.delete(Barang, {perusahaan: perusahaanEntity})
     await db.manager.delete(Perusahaan, id)
-    return res.status(200).json({
-      status: 'success',
-      message: 'Perusahaan deleted successfully',
-      data: {
-        id: id,
-        nama: perusahaanEntity.nama,
-        alamat: perusahaanEntity.alamat,
-        no_telp: perusahaanEntity.no_telp,
-        kode: perusahaanEntity.kode
-      }
-    })
+
+    return ResponseUtil.sendResponse(res, 200, 'Perusahaan deleted successfully', perusahaanEntity)
   } catch (error) {
-    return res.status(500).json({
-      status: 'error',
-      message: 'Failed to delete Perusahaan',
-      data: {
-        id: id,
-        nama: null,
-        alamat: null,
-        no_telp: null,
-        kode: null
-      }
-    })
+      
+    return ResponseUtil.sendError(res, 500, 'Failed to delete Perusahaan', req.params)
   }
 }

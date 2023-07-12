@@ -1,76 +1,32 @@
 import { Request, Response } from 'express'
 import { Barang } from '../models/barang.model'
-import { Perusahaan } from '../models/perusahaan.model'
 import { DataSource } from 'typeorm';
 import { findBarangById, findPerusahaanById } from '../utils/controller.utils';
+import { ResponseUtil } from '../utils/response.utils';
 
 export const createBarang = async (req: Request, res: Response, db: DataSource) => {
     const { nama, harga, stok, perusahaan_id, kode } = req.body
-
     try {
         const perusahaanEntity = await findPerusahaanById(perusahaan_id, db)
 
         if (!perusahaanEntity) {
-            return res.status(500).json({ 
-              status: 'error',
-              message: 'Perusahaan not found',
-              data: {
-                  id: null,
-                  nama: nama,
-                  harga: harga,
-                  stok: stok,
-                  kode: kode,
-                  perusahaan_id: perusahaan_id
-              }
-          })
+          return ResponseUtil.sendError(res, 500, 'Perusahaan not found', req.body)
         }
 
         const barangEntity = await db.manager.findOne(Barang, { where: { kode: kode } })
+
         if (barangEntity) {
-            return res.status(500).json({ 
-              status: 'error',
-              message: 'Barang with the code given already exist',
-              data: {
-                  id: null,
-                  nama: nama,
-                  harga: harga,
-                  stok: stok,
-                  kode: kode,
-                  perusahaan_id: perusahaan_id
-              }
-          })
+          return ResponseUtil.sendError(res, 500, 'Barang with the code given already exist', barangEntity)
         }
-    
+
         const barang = new Barang(nama, harga, stok, perusahaanEntity, kode)
-    
         await db.manager.save(barang)
-    
-        res.status(201).json({ 
-            status: 'success',
-            message: 'Barang created successfully',
-            data: {
-                id: barang.id,
-                nama: barang.nama,
-                harga: barang.harga,
-                stok: barang.stok,
-                kode: barang.kode,
-                perusahaan_id: perusahaan_id
-            } })
+
+        return ResponseUtil.sendResponseBarang(res, 201, 'Barang created successfully', barang)
 
     } catch (error) {
-        console.error('Failed to create Barang:', error);
-        res.status(500).json({ 
-            status: 'error',
-            message: 'Failed to create Barang',
-            data: {
-                id: null,
-                nama: nama,
-                harga: harga,
-                stok: stok,
-                kode: kode,
-                perusahaan_id: perusahaan_id
-            }
-        })
+
+        return ResponseUtil.sendError(res, 500, 'Failed to create Barang', req.body)
     }
 }
 
@@ -78,94 +34,45 @@ export const getBarang = async (req: Request, res: Response, db: DataSource) => 
     const { id } = req.params;
     try {
       const barangEntity = await findBarangById(id, db)
-  
+
       if (!barangEntity) {
-        return res.status(400).json({
-          status: 'error',
-          message: 'Failed to find barang',
-          data: {
-            id: id,
-            nama: null,
-            harga: null,
-            stok: null,
-            kode: null,
-            perusahaan_id: null
-          }
-        })
+        return ResponseUtil.sendError(res, 500, 'Barang not found', req.params)
       }
-  
-      res.status(200).json({
-        status: 'success',
-        message: 'Barang found',
-        data: {
-          id: barangEntity.id,
-          nama: barangEntity.nama,
-          harga: barangEntity.harga,
-          stok: barangEntity.stok,
-          kode: barangEntity.kode,
-          perusahaan_id: barangEntity.perusahaan.id
-        }
-      })
+
+      return ResponseUtil.sendResponseBarang(res, 200, 'Barang found', barangEntity)
+
     } catch (error) {
-      res.status(500).json({
-        status: 'error',
-        message: 'Failed to find barang',
-        data: {
-          id: id,
-          nama: null,
-          harga: null,
-          stok: null,
-          kode: null,
-          perushaan_id: null
-        }
-      })
+
+      return ResponseUtil.sendError(res, 500, 'Failed to get Barang', req.params)
     }
 }
 
 
-// export const searchBarang = async (req: Request, res: Response, db: DataSource) => {
-//   const { q, perusahaan } = req.query;
-//   try {
-//     const whereCondition: {
-//       nama?: string;
-//       kode?: string;
-//       perusahaan?: string;
-//     } = {};
+export const searchBarang = async (req: Request, res: Response, db: DataSource) => {
+  const { q, perusahaan } = req.query;
+  try {
+    const barangRepository = db.getRepository(Barang);
+    const searchString = q?.toString();
+    const perusahaanString = perusahaan?.toString();
 
-//     if (q) {
-//       whereCondition.nama = q.toString();
-//       whereCondition.kode = q.toString();
-//     }
+    var barangData = await barangRepository
+                  .createQueryBuilder('barang')
+                  .leftJoinAndSelect('barang.perusahaan', 'perusahaan')
+                  .where('barang.nama LIKE :searchString OR barang.kode LIKE :searchString', { searchString: `%${searchString}%` })
+                  .andWhere('perusahaan.id = :perusahaanString', { perusahaanString: perusahaanString })
+                  .getMany()
 
-//     if (perusahaan) {
-//       whereCondition.perusahaan = perusahaan.toString();
-//     }
+    if (barangData.length === 0) {
+      return ResponseUtil.sendError(res, 404, 'Barang not found', [])
+    }
 
-//     const barangs = await db.manager.find(Barang, {
-//       where: whereCondition,
-//       relations: ['perusahaan'],
-//     });
+    return ResponseUtil.sendResponseBarangArray(res, 200, 'Barang found', barangData)
 
-//     res.status(200).json({
-//       status: 'success',
-//       message: 'Barang found',
-//       data: barangs.map((barang) => ({
-//         id: barang.id,
-//         nama: barang.nama,
-//         harga: barang.harga,
-//         stok: barang.stok,
-//         kode: barang.kode,
-//         perusahaan_id: barang.perusahaan.id,
-//       })),
-//     });
-//   } catch (error) {
-//     res.status(500).json({
-//       status: 'error',
-//       message: 'Failed to search barang',
-//       data: [],
-//     });
-//   }
-// }
+  } catch (error) {
+
+    return ResponseUtil.sendError(res, 500, 'Failed to search barang', [])
+  }
+}
 
 
 export const updateBarang = async (req: Request, res: Response, db: DataSource) => {
@@ -176,50 +83,17 @@ export const updateBarang = async (req: Request, res: Response, db: DataSource) 
       const barangEntity = await findBarangById(id, db)
   
       if (barangEntity == null) {
-        return res.status(400).json({
-          status: 'error',
-          message: 'Failed to find barang',
-          data: {
-            id: id,
-            nama: null,
-            harga: null,
-            stok: null,
-            kode: null,
-            perusahaan_id: null
-          }
-        })
+        return ResponseUtil.sendError(res, 500, 'Barang not found', req.params)
       }
   
       const perusahaanEntity = await findPerusahaanById(perusahaan_id, db)
   
       if (!perusahaanEntity) {
-        return res.status(400).json({
-            status: 'error',
-            message: 'Perusahaan not found',
-            data: {
-              id: id,
-              nama: nama,
-              harga: harga,
-              stok: stok,
-              kode: kode,
-              perusahaan_id: perusahaan_id
-            }
-          })
+        return ResponseUtil.sendError(res, 500, 'Perusahaan not found', req.body)
       }
 
       if (nama == null || harga == null || stok == null || kode == null) {
-        return res.status(400).json({
-          status: 'error',
-          message: 'Every Barang data must not be empty',
-          data: {
-            id: id,
-            nama: nama,
-            harga: harga,
-            stok: stok,
-            kode: kode,
-            perusahaan_id: perusahaan_id
-          }
-        })
+        return ResponseUtil.sendError(res, 500, 'Barang data is not complete', req.body)
       }
       
       barangEntity.nama = nama;
@@ -229,33 +103,12 @@ export const updateBarang = async (req: Request, res: Response, db: DataSource) 
       barangEntity.kode = kode;
   
       await db.manager.save(barangEntity);
-  
-      res.status(200).json({
-        status: 'success',
-        message: 'Barang updated successfully',
-        data: {
-          id: barangEntity.id,
-          nama: barangEntity.nama,
-          harga: barangEntity.harga,
-          stok: barangEntity.stok,
-          kode: barangEntity.kode,
-          perusahaan: barangEntity.perusahaan.id
-        }
-      })
+
+      return ResponseUtil.sendResponseBarang(res, 200, 'Barang updated successfully', barangEntity)
 
     } catch (error) {
-      res.status(500).json({
-        status: 'error',
-        message: 'Failed to update barang',
-        data: {
-          id: id,
-          nama: null,
-          harga: null,
-          stok: null,
-          kode: null,
-          perusahaan_id: null
-        }
-      });
+
+      return ResponseUtil.sendError(res, 500, 'Failed to update Barang', req.body)
     }
 }
 
@@ -265,46 +118,15 @@ export const deleteBarangById = async (req: Request, res: Response, db: DataSour
       const barangEntity = await findBarangById(id, db)
   
       if (!barangEntity) {
-        return res.status(400).json({
-          status: 'error',
-          message: 'Failed to find barang',
-          data: {
-            id: id,
-            nama: null,
-            harga: null,
-            stok: null,
-            kode: null,
-            perusahaan_id: null
-          }
-        })
+        return ResponseUtil.sendError(res, 500, 'Barang not found', req.params)
       }
   
       await db.manager.remove(barangEntity)
+
+      return ResponseUtil.sendResponseBarang(res, 200, 'Barang deleted successfully', barangEntity)
   
-      res.status(200).json({
-        status: 'success',
-        message: 'Barang deleted successfully',
-        data: {
-          id: barangEntity.id,
-          nama: barangEntity.nama,
-          harga: barangEntity.harga,
-          stok: barangEntity.stok,
-          kode: barangEntity.kode,
-          perusahaan_id: barangEntity.perusahaan.id
-        }
-      })
     } catch (error) {
-      res.status(500).json({
-        status: 'error',
-        message: 'Failed to delete barang',
-        data: {
-          id: id,
-          nama: null,
-          harga: null,
-          stok: null,
-          kode: null,
-          perusahaan_id: null
-        }
-      })
+    
+        return ResponseUtil.sendError(res, 500, 'Failed to delete Barang', req.params) 
     }
 }

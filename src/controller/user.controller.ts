@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
-import { User } from '../models/user.model';
-// import jwt from 'jsonwebtoken';
+import { UserModel } from '../models/user.model';
+import config from 'config';
+import jwt from 'jsonwebtoken';
 import { DataSource } from 'typeorm';
 
-const secretKey = 'your-secret-key'; // Replace with your own secret key
+const secretKey = config.get('tokenSecretKey'); // Replace with your own secret key
 
 export const register = async (req: Request, res: Response, db: DataSource) => {
     const { username, password, name } = req.body;
@@ -20,7 +21,7 @@ export const register = async (req: Request, res: Response, db: DataSource) => {
             })
         }
 
-        const userEntity = await db.manager.findOne(User, { where: { username: username } });
+        const userEntity = await db.manager.findOne(UserModel, { where: { username: username } });
         if (userEntity) {
             return res.status(500).json({
                 status: 'error',
@@ -33,7 +34,7 @@ export const register = async (req: Request, res: Response, db: DataSource) => {
             })
         }
 
-        const user = new User(username, password, name)
+        const user = new UserModel(username, password, name)
         await db.manager.save(user)
 
         return res.status(201).json({
@@ -63,7 +64,7 @@ export const login = async (req: Request, res: Response, db: DataSource) => {
   const { username, password } = req.body;
 
   try {
-    const user = await db.manager.findOne(User, { where: { username: username } });
+    const user = await db.manager.findOne(UserModel, { where: { username: username } });
 
     if (!user || user.password !== password) {
       return res.status(401).json({
@@ -74,7 +75,8 @@ export const login = async (req: Request, res: Response, db: DataSource) => {
     }
 
     // Generate JWT token
-    // const token = jwt.sign({ userId: user.id }, secretKey);
+    const token = jwt.sign({ userId: user.id }, secretKey);
+    res.cookie('token', token, { httpOnly: true });
 
     res.status(200).json({
       status: 'success',
@@ -84,7 +86,7 @@ export const login = async (req: Request, res: Response, db: DataSource) => {
           username: user.username,
           name: user.name
         },
-        // token: token
+        token: token
       }
     });
   } catch (error) {
