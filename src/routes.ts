@@ -1,10 +1,13 @@
 import { Express } from 'express';
 import { DataSource } from 'typeorm';
-import { createBarang, getBarang, updateBarang, deleteBarangById, searchBarang } from './controller/barang.controller';
-import { createPerusahaan, getPerusahaanById, updatePerusahaan, deletePerusahaanById, searchPerusahaan } from './controller/perusahaan.controller';
+import { BarangController } from './controller/barang.controller';
+import { PerusahaanController } from './controller/perusahaan.controller';
 import { register, login } from './controller/user.controller';
 
 function routes(app: Express, db: DataSource) {
+  const barangController = new BarangController(db);
+  const perusahaanController = new PerusahaanController(db);
+
   app.get('/self', (req, res) => {
     res.sendStatus(200);
   });
@@ -20,46 +23,44 @@ function routes(app: Express, db: DataSource) {
 
   // Route for managing barang
   app.post('/barang', (req, res) => {
-    createBarang(req, res, db);
+    barangController.createBarang(req, res);
   });
 
   app.get('/barang', (req, res) => {
-    searchBarang(req, res, db);
+    barangController.searchBarang(req, res);
   });
 
   app.get('/barang/:id', (req, res) => {
-    getBarang(req, res, db);
+    barangController.getBarang(req, res);
   });
 
   app.put('/barang/:id', (req, res) => {
-    updateBarang(req, res, db);
+    barangController.updateBarang(req, res);
   });
 
   app.delete('/barang/:id', (req, res) => {
-    deleteBarangById(req, res, db);
+    barangController.deleteBarangById(req, res);
   });
-
-
 
   // Route for managing perusahaan
   app.post('/perusahaan', (req, res) => {
-    createPerusahaan(req, res, db);
+    perusahaanController.createPerusahaan(req, res);
   });
 
   app.get('/perusahaan', (req, res) => {
-    searchPerusahaan(req, res, db);
+    perusahaanController.searchPerusahaan(req, res);
   });
 
   app.get('/perusahaan/:id', (req, res) => {
-    getPerusahaanById(req, res, db);
+    perusahaanController.getPerusahaanById(req, res);
   });
 
   app.put('/perusahaan/:id', (req, res) => {
-    updatePerusahaan(req, res, db);
+    perusahaanController.updatePerusahaan(req, res);
   });
 
   app.delete('/perusahaan/:id', (req, res) => {
-    deletePerusahaanById(req, res, db);
+    perusahaanController.deletePerusahaanById(req, res);
   });
 
   /* Nonexisting Route handling */
