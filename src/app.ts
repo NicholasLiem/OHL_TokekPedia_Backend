@@ -18,6 +18,7 @@ app.use(cookieParser());
     app.listen(port, () => {
       console.log(`Server is running on port ${port}`)
     });
+    
   } catch (error) {
     console.error('Failed to initialize Postgres:', error)
     process.exit(1)

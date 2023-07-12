@@ -1,10 +1,10 @@
-import { DataSource } from "typeorm";
+import { Repository } from "typeorm";
 import { Barang } from "../models/barang.model";
 import { Perusahaan } from "../models/perusahaan.model";
 
-export const findBarangById = async (id: string, db: DataSource) => {
+export const findBarangById = async (id: string, db: Repository<Barang>) => {
     try {
-        const barangEntity = await db.manager.findOne(Barang, { where: { id: id }, relations: ['perusahaan'] })
+        const barangEntity = await db.findOne({ where: { id: id } })
         return barangEntity
     } catch (error) {
         console.error('Failed to find Barang by id:', error)
@@ -12,10 +12,10 @@ export const findBarangById = async (id: string, db: DataSource) => {
     }
 }
 
-export const findPerusahaanById = async (id: string, db: DataSource) => {
+export const findPerusahaanById = async (id: string, db: Repository<Perusahaan>) => {
 
     try {
-        const perusahaanEntity = await db.manager.findOne(Perusahaan, { where: { id: id } })
+        const perusahaanEntity = await db.findOne({ where: { id: id } })
         return perusahaanEntity
     } catch (error) {
         console.error('Failed to find Perusahaan by id:', error)
@@ -23,9 +23,9 @@ export const findPerusahaanById = async (id: string, db: DataSource) => {
     }
 }
 
-export const findPerusahaanByName = async (nama: string, db: DataSource) => {
+export const findPerusahaanByName = async (nama: string, db: Repository<Perusahaan>) => {
     try {
-        const perusahaanEntity = await db.manager.findOne(Perusahaan, { where: { nama: nama } })
+        const perusahaanEntity = await db.findOne({ where: { nama: nama } })
         return perusahaanEntity
     } catch (error) {
         console.error('Failed to find Perusahaan by nama:', error)
