@@ -4,7 +4,8 @@ import { DataSource } from 'typeorm';
 import { findBarangById, findPerusahaanById } from '../utils/controller.utils';
 import { ResponseUtil } from '../utils/response.utils';
 
-export const createBarang = async (req: Request, res: Response, db: DataSource) => {
+export class BarangController{
+  async createBarang(req: Request, res: Response, db: DataSource): Promise<Response> {
     const { nama, harga, stok, perusahaan_id, kode } = req.body
     try {
         const perusahaanEntity = await findPerusahaanById(perusahaan_id, db)
@@ -28,9 +29,9 @@ export const createBarang = async (req: Request, res: Response, db: DataSource) 
 
         return ResponseUtil.sendError(res, 500, 'Failed to create Barang', req.body)
     }
-}
+  }
 
-export const getBarang = async (req: Request, res: Response, db: DataSource) => {
+  async getBarang(req: Request, res: Response, db: DataSource): Promise<Response> {
     const { id } = req.params;
     try {
       const barangEntity = await findBarangById(id, db)
@@ -45,37 +46,37 @@ export const getBarang = async (req: Request, res: Response, db: DataSource) => 
 
       return ResponseUtil.sendError(res, 500, 'Failed to get Barang', req.params)
     }
-}
-
-
-export const searchBarang = async (req: Request, res: Response, db: DataSource) => {
-  const { q, perusahaan } = req.query;
-  try {
-    const barangRepository = db.getRepository(Barang);
-    const searchString = q?.toString();
-    const perusahaanString = perusahaan?.toString();
-
-    var barangData = await barangRepository
-                  .createQueryBuilder('barang')
-                  .leftJoinAndSelect('barang.perusahaan', 'perusahaan')
-                  .where('barang.nama LIKE :searchString OR barang.kode LIKE :searchString', { searchString: `%${searchString}%` })
-                  .andWhere('perusahaan.id = :perusahaanString', { perusahaanString: perusahaanString })
-                  .getMany()
-
-    if (barangData.length === 0) {
-      return ResponseUtil.sendError(res, 404, 'Barang not found', [])
-    }
-
-    return ResponseUtil.sendResponseBarangArray(res, 200, 'Barang found', barangData)
-
-  } catch (error) {
-
-    return ResponseUtil.sendError(res, 500, 'Failed to search barang', [])
   }
-}
 
 
-export const updateBarang = async (req: Request, res: Response, db: DataSource) => {
+  async searchBarang(req: Request, res: Response, db: DataSource): Promise<Response> {
+    const { q, perusahaan } = req.query;
+    try {
+      const barangRepository = db.getRepository(Barang);
+      const searchString = q?.toString();
+      const perusahaanString = perusahaan?.toString();
+
+      var barangData = await barangRepository
+                    .createQueryBuilder('barang')
+                    .leftJoinAndSelect('barang.perusahaan', 'perusahaan')
+                    .where('barang.nama LIKE :searchString OR barang.kode LIKE :searchString', { searchString: `%${searchString}%` })
+                    .andWhere('perusahaan.id = :perusahaanString', { perusahaanString: perusahaanString })
+                    .getMany()
+
+      if (barangData.length === 0) {
+        return ResponseUtil.sendError(res, 404, 'Barang not found', [])
+      }
+
+      return ResponseUtil.sendResponseBarangArray(res, 200, 'Barang found', barangData)
+
+    } catch (error) {
+
+      return ResponseUtil.sendError(res, 500, 'Failed to search barang', [])
+    }
+  }
+
+
+  async updateBarang(req: Request, res: Response, db: DataSource): Promise<Response> {
     const { id } = req.params
     const { nama, harga, stok, perusahaan_id, kode } = req.body
 
@@ -110,9 +111,9 @@ export const updateBarang = async (req: Request, res: Response, db: DataSource) 
 
       return ResponseUtil.sendError(res, 500, 'Failed to update Barang', req.body)
     }
-}
+  }
 
-export const deleteBarangById = async (req: Request, res: Response, db: DataSource) => {
+  async deleteBarangById(req: Request, res: Response, db: DataSource): Promise<Response> {
     const { id } = req.params
     try {
       const barangEntity = await findBarangById(id, db)
@@ -129,4 +130,5 @@ export const deleteBarangById = async (req: Request, res: Response, db: DataSour
     
         return ResponseUtil.sendError(res, 500, 'Failed to delete Barang', req.params) 
     }
+  }
 }
