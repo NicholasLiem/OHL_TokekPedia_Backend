@@ -172,5 +172,4 @@ export class BarangController {
       return ResponseUtil.sendError(res, 500, 'Failed to delete Barang', null);
     }
   }
-  
 }

@@ -7,11 +7,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
-    "typeorm": "typeorm-ts-node-commonjs -d src/utils/data-source.ts",
-    "migration:show": "yarn typeorm migration:show",
-    "migration:create": "node scripts/migration-create.js",
-    "migration:generate": "node scripts/migration-generate.js",
-    "migration:revert": "yarn typeorm migration:revert"
+    "migration:run": "npx typeorm-ts-node-esm migration:run --dataSource ./src/database/data-source.ts"
   },
   "dependencies": {
     "@types/config": "^3.3.0",
@@ -33,5 +29,6 @@
     "ts-node-dev": "^2.0.0",
     "typeorm": "^0.3.17",
     "typescript": "^5.0.4"
-  }
+  },
+  "devDependencies": {}
 }
