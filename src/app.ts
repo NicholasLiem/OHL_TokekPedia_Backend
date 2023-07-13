@@ -3,7 +3,6 @@ import config from 'config'
 import routes from './routes'
 import postgresSetup from './utils/postgres.connect'
 import cookieParser from 'cookie-parser'
-import deserializeUser from './middlewares/deserializeUser.middleware'
 import cors from 'cors'
 
 const app = express()
@@ -11,8 +10,7 @@ const port = config.get<number>('port')
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors())
-app.use(deserializeUser);
+app.use(cors());
 
 (async () => {
   try {

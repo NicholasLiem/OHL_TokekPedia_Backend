@@ -3,8 +3,7 @@ import { DataSource } from 'typeorm';
 import { BarangController } from './controller/barang.controller';
 import { PerusahaanController } from './controller/perusahaan.controller';
 import { SessionController } from './controller/session.controller';
-import { register } from './controller/user.controller';
-import { requireUser } from './middlewares/requireUser.middleware';
+import { checkToken } from './middlewares/checkToken.middleware';
 
 function routes(app: Express, db: DataSource) {
   const barangController = new BarangController(db);
@@ -12,24 +11,8 @@ function routes(app: Express, db: DataSource) {
   const sessionController = new SessionController(db);
 
   // Login and Session
-  app.post('/register', (req, res) => {
-    register(req, res, db);
-  });
-
-  app.get('/self', (req, res) => {
+  app.get('/self', checkToken, (req, res) => {
     sessionController.getSessionHandler(req, res);
-  });
-
-  app.post('/logout', (req, res) => {
-    sessionController.deleteSessionHandler(req, res);
-  });
-
-  app.get('/session', (req, res) => {
-    sessionController.getSessionHandler(req, res);
-  });
-
-  app.delete('/session', (req, res) => {
-    sessionController.deleteSessionHandler(req, res);
   });
 
   app.post('/login', (req, res) => {
@@ -37,7 +20,7 @@ function routes(app: Express, db: DataSource) {
   });
 
   // Route for managing barang
-  app.post('/barang', (req, res) => {
+  app.post('/barang', checkToken, (req, res) => {
     barangController.createBarang(req, res);
   });
 
@@ -49,16 +32,16 @@ function routes(app: Express, db: DataSource) {
     barangController.getBarang(req, res);
   });
 
-  app.put('/barang/:id', (req, res) => {
+  app.put('/barang/:id', checkToken, (req, res) => {
     barangController.updateBarang(req, res);
   });
 
-  app.delete('/barang/:id', (req, res) => {
+  app.delete('/barang/:id', checkToken, (req, res) => {
     barangController.deleteBarangById(req, res);
   });
 
   // Route for managing perusahaan
-  app.post('/perusahaan', (req, res) => {
+  app.post('/perusahaan', checkToken, (req, res) => {
     perusahaanController.createPerusahaan(req, res);
   });
 
@@ -70,11 +53,11 @@ function routes(app: Express, db: DataSource) {
     perusahaanController.getPerusahaanById(req, res);
   });
 
-  app.put('/perusahaan/:id', (req, res) => {
+  app.put('/perusahaan/:id', checkToken, (req, res) => {
     perusahaanController.updatePerusahaan(req, res);
   });
 
-  app.delete('/perusahaan/:id', (req, res) => {
+  app.delete('/perusahaan/:id', checkToken, (req, res) => {
     perusahaanController.deletePerusahaanById(req, res);
   });
 

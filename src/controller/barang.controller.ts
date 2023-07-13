@@ -165,10 +165,8 @@ export class BarangController {
       }
   
       await this.barangRepository.delete(barangEntity);
-      console.log('barangEntity:', barangEntity);
       return ResponseUtil.sendResponseBarang(res, 200, 'Barang deleted successfully', barangEntity);
     } catch (error) {
-      console.log(error);
       return ResponseUtil.sendError(res, 500, 'Failed to delete Barang', null);
     }
   }
