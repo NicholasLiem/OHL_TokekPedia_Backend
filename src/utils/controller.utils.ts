@@ -4,7 +4,11 @@ import { Perusahaan } from "../models/perusahaan.model";
 
 export const findBarangById = async (id: string, db: Repository<Barang>) => {
     try {
-        const barangEntity = await db.findOne({ where: { id: id } })
+        const barangEntity = await db
+            .createQueryBuilder('barang')
+            .leftJoinAndSelect('barang.perusahaan', 'perusahaan')
+            .where('barang.id = :id', { id })
+            .getOne();
         return barangEntity
     } catch (error) {
         console.error('Failed to find Barang by id:', error)

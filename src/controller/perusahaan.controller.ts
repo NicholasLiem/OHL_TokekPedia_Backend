@@ -48,7 +48,9 @@ export class PerusahaanController {
       const searchString = q?.toString();
 
       if (!searchString) {
-        return ResponseUtil.sendError(res, 400, 'Search query is empty', req.query);
+        //Return all perusahaan
+        const perusahaanData = await this.perusahaanRepository.find();
+        return ResponseUtil.sendResponse(res, 200, 'Perusahaan found', perusahaanData);
       }
 
       const perusahaanData = await this.perusahaanRepository
@@ -115,7 +117,9 @@ export class PerusahaanController {
       const perusahaanEntity = await findPerusahaanById(id, this.perusahaanRepository);
 
       if (!perusahaanEntity) {
-        return ResponseUtil.sendError(res, 404, 'Perusahaan not found', req.params);
+        return ResponseUtil.sendError(res, 404, 'Perusahaan not found', {
+          id: req.params.id,
+        });
       }
 
       await this.barangRepository.delete({ perusahaan: perusahaanEntity });
@@ -123,7 +127,9 @@ export class PerusahaanController {
 
       return ResponseUtil.sendResponse(res, 200, 'Perusahaan deleted successfully', perusahaanEntity);
     } catch (error) {
-      return ResponseUtil.sendError(res, 500, 'Failed to delete Perusahaan', req.params);
+      return ResponseUtil.sendError(res, 500, 'Failed to delete Perusahaan', {
+        id: req.params.id,
+      });
     }
   }
 }

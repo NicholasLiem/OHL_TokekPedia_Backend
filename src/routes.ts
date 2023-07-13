@@ -12,23 +12,23 @@ function routes(app: Express, db: DataSource) {
   const sessionController = new SessionController(db);
 
   // Login and Session
-  app.post('/register', requireUser, (req, res) => {
+  app.post('/register', (req, res) => {
     register(req, res, db);
   });
 
-  app.get('/self', requireUser, (req, res) => {
+  app.get('/self', (req, res) => {
     sessionController.getSessionHandler(req, res);
   });
 
-  app.post('/logout', requireUser, (req, res) => {
+  app.post('/logout', (req, res) => {
     sessionController.deleteSessionHandler(req, res);
   });
 
-  app.get('/session', requireUser, (req, res) => {
+  app.get('/session', (req, res) => {
     sessionController.getSessionHandler(req, res);
   });
 
-  app.delete('/session', requireUser, (req, res) => {
+  app.delete('/session', (req, res) => {
     sessionController.deleteSessionHandler(req, res);
   });
 
@@ -37,44 +37,44 @@ function routes(app: Express, db: DataSource) {
   });
 
   // Route for managing barang
-  app.post('/barang', requireUser, (req, res) => {
+  app.post('/barang', (req, res) => {
     barangController.createBarang(req, res);
   });
 
-  app.get('/barang', requireUser, (req, res) => {
+  app.get('/barang', (req, res) => {
     barangController.searchBarang(req, res);
   });
 
-  app.get('/barang/:id', requireUser, (req, res) => {
+  app.get('/barang/:id', (req, res) => {
     barangController.getBarang(req, res);
   });
 
-  app.put('/barang/:id', requireUser, (req, res) => {
+  app.put('/barang/:id', (req, res) => {
     barangController.updateBarang(req, res);
   });
 
-  app.delete('/barang/:id', requireUser, (req, res) => {
+  app.delete('/barang/:id', (req, res) => {
     barangController.deleteBarangById(req, res);
   });
 
   // Route for managing perusahaan
-  app.post('/perusahaan', requireUser, (req, res) => {
+  app.post('/perusahaan', (req, res) => {
     perusahaanController.createPerusahaan(req, res);
   });
 
-  app.get('/perusahaan', requireUser, (req, res) => {
+  app.get('/perusahaan', (req, res) => {
     perusahaanController.searchPerusahaan(req, res);
   });
 
-  app.get('/perusahaan/:id', requireUser, (req, res) => {
+  app.get('/perusahaan/:id', (req, res) => {
     perusahaanController.getPerusahaanById(req, res);
   });
 
-  app.put('/perusahaan/:id', requireUser, (req, res) => {
+  app.put('/perusahaan/:id', (req, res) => {
     perusahaanController.updatePerusahaan(req, res);
   });
 
-  app.delete('/perusahaan/:id', requireUser, (req, res) => {
+  app.delete('/perusahaan/:id', (req, res) => {
     perusahaanController.deletePerusahaanById(req, res);
   });
 

@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { Barang } from '../models/barang.model';
 import { Perusahaan } from '../models/perusahaan.model';
 import { DataSource, Repository } from 'typeorm';
-import { findBarangById, findPerusahaanById } from '../utils/controller.utils';
+import { findBarangById, findPerusahaanById, findPerusahaanByName } from '../utils/controller.utils';
 import { ResponseUtil } from '../utils/response.utils';
 
 export class BarangController {
@@ -18,14 +18,24 @@ export class BarangController {
     const { nama, harga, stok, perusahaan_id, kode } = req.body;
 
     try {
+
+      const barangEntity = await this.barangRepository.findOne({ where: { kode: kode } });
+      if (barangEntity) {
+        return ResponseUtil.sendError(res, 400, 'Barang with the code given already exists', barangEntity);
+      }
+
+      // Kasus ketika perusahaan_id is name instead of UUID
+      // Bug: Harusnya Fixed sih sekarang
+      const perusahaanEntityByName = await findPerusahaanByName(perusahaan_id, this.perusahaanRepository);
+      if (perusahaanEntityByName) {
+        const barang = new Barang(nama, harga, stok, perusahaanEntityByName, kode);
+        await this.barangRepository.save(barang);
+        return ResponseUtil.sendResponseBarang(res, 201, 'Barang created successfully', barang);
+      }
+
       const perusahaanEntity = await findPerusahaanById(perusahaan_id, this.perusahaanRepository);
       if (!perusahaanEntity) {
         return ResponseUtil.sendError(res, 404, 'Perusahaan not found', req.body);
-      }
-
-      const barangEntity = await this.barangRepository.findOne({ where: { kode, perusahaan: perusahaanEntity } });
-      if (barangEntity) {
-        return ResponseUtil.sendError(res, 400, 'Barang with the code given already exists', barangEntity);
       }
 
       const barang = new Barang(nama, harga, stok, perusahaanEntity, kode);
@@ -59,16 +69,48 @@ export class BarangController {
       const searchString = q?.toString();
       const perusahaanString = perusahaan?.toString();
 
+      // Return all if both null
+      if (!searchString && !perusahaanString) {
+        const barangData = await this.barangRepository
+          .createQueryBuilder('barang')
+          .leftJoinAndSelect('barang.perusahaan', 'perusahaan')
+          .getMany();
+        return ResponseUtil.sendResponseBarangArray(res, 200, 'Barang found', barangData);
+      }
+      
+      // Case: Perusahaan Name given & Search String null
+      if (perusahaanString && !searchString) {
+        const perusahaanEntity = await findPerusahaanByName(perusahaanString, this.perusahaanRepository);
+        if (!perusahaanEntity) {
+          return ResponseUtil.sendError(res, 404, 'Perusahaan not found', req.query);
+        }
+
+        const barangData = await this.barangRepository
+          .createQueryBuilder('barang')
+          .leftJoinAndSelect('barang.perusahaan', 'perusahaan')
+          .where('perusahaan.nama = :perusahaanString', { perusahaanString })
+          .getMany();
+
+        return ResponseUtil.sendResponseBarangArray(res, 200, 'Barang found', barangData);
+      }
+
+      // Case: Search String given & Perusahaan Name null
+      if (!perusahaanString && searchString) {
+        const barangData = await this.barangRepository
+          .createQueryBuilder('barang')
+          .leftJoinAndSelect('barang.perusahaan', 'perusahaan')
+          .where('barang.nama LIKE :searchString OR barang.kode LIKE :searchString', { searchString: `%${searchString}%` })
+          .getMany();
+        return ResponseUtil.sendResponseBarangArray(res, 200, 'Barang found', barangData);
+      }
+
+      // Case: Both given
       const barangData = await this.barangRepository
         .createQueryBuilder('barang')
         .leftJoinAndSelect('barang.perusahaan', 'perusahaan')
         .where('barang.nama LIKE :searchString OR barang.kode LIKE :searchString', { searchString: `%${searchString}%` })
         .andWhere('perusahaan.id = :perusahaanString', { perusahaanString })
         .getMany();
-
-      if (barangData.length === 0) {
-        return ResponseUtil.sendError(res, 404, 'Barang not found', []);
-      }
 
       return ResponseUtil.sendResponseBarangArray(res, 200, 'Barang found', barangData);
     } catch (error) {
@@ -95,6 +137,11 @@ export class BarangController {
         return ResponseUtil.sendError(res, 400, 'Barang data is not complete', req.body);
       }
 
+      const barangWithSameKode = await this.barangRepository.findOne({ where: { kode, perusahaan: perusahaanEntity } });
+      if (barangWithSameKode && barangWithSameKode.id !== barangEntity.id) {
+        return ResponseUtil.sendError(res, 400, 'Barang with the code given already exists', barangWithSameKode);
+      }
+
       barangEntity.nama = nama;
       barangEntity.harga = harga;
       barangEntity.stok = stok;
@@ -110,17 +157,20 @@ export class BarangController {
 
   async deleteBarangById(req: Request, res: Response): Promise<Response> {
     const { id } = req.params;
-
+  
     try {
       const barangEntity = await findBarangById(id, this.barangRepository);
       if (!barangEntity) {
-        return ResponseUtil.sendError(res, 404, 'Barang not found', req.params);
+        return ResponseUtil.sendError(res, 404, 'Barang not found', null);
       }
-
-      await this.barangRepository.remove(barangEntity);
+  
+      await this.barangRepository.delete(barangEntity);
+      console.log('barangEntity:', barangEntity);
       return ResponseUtil.sendResponseBarang(res, 200, 'Barang deleted successfully', barangEntity);
     } catch (error) {
-      return ResponseUtil.sendError(res, 500, 'Failed to delete Barang', req.params);
+      console.log(error);
+      return ResponseUtil.sendError(res, 500, 'Failed to delete Barang', null);
     }
   }
+  
 }
