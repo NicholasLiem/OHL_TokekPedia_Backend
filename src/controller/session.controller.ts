@@ -78,8 +78,9 @@ export class SessionController {
         username: username,
         name: "admin",
       },
-      accessToken: accessToken,
-      refreshToken: refreshToken,
+      token: accessToken,
+      // accessToken: accessToken,
+      // refreshToken: refreshToken,
     })
   };
 
