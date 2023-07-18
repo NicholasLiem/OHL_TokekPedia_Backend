@@ -12,7 +12,7 @@ export const dataSource = new DataSource({
     database: config.get('dbDatabase'),
     entities: ["src/models/*.model.ts"],
     migrations: ['src/database/migrations/*.{js,ts}'],     
-    migrationsRun: true,
+    // migrationsRun: true,
     // synchronize: true, 
     logging: true, 
 });

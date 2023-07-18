@@ -15,30 +15,34 @@ export class SessionController {
     const { username, password } = req.body;
     const userEntity = await this.UserRepository.findOne({
       where: { username: username },
-    })
+    });
 
     if (!userEntity || userEntity.password !== password) {
-      return ResponseUtil.sendError(res, 401, "Invalid username or password", null);
+      return ResponseUtil.sendError(res, 401, 'Invalid username or password', null);
     }
 
-    const token = signJWT({
-      username: username,
-      password: password,
-      name: userEntity.name,
-      }, "1y");
+    const token = signJWT(
+      {
+        username: username,
+        password: password,
+        name: userEntity.name,
+      },
+      '1y'
+    );
 
-    return ResponseUtil.sendResponse(res, 200, "Session created", {
+    return ResponseUtil.sendResponse(res, 200, 'Session created', {
       user: {
         username: username,
         name: userEntity.name,
       },
       token: token,
-    })
-  };
+    });
+  }
 
   async getSessionHandler(req: Request, res: Response): Promise<Response> {
     // @ts-ignore
-    const { username } = req.tokenPayload;
+    const username = req.payload.username
+
     const userEntity = await this.UserRepository.findOne({
       where: { username: username },
     })
@@ -51,10 +55,8 @@ export class SessionController {
     }
 
     return ResponseUtil.sendResponse(res, 200, "Session created", {
-      user: {
         username: username,
         name: userEntity.name,
-      },
     })
   }
   

@@ -43,11 +43,11 @@ export function signJWT(payload: object, expiresIn: string | number){
     return jwt.sign(payload, privateKey, { algorithm: 'RS256', expiresIn: expiresIn });
 }
 
-export function verifyJWT(token: string){
+export function verifyJWT(token: string) {
     try {
-        const decoded = jwt.verify(token, publicKey, { algorithms: ['RS256']});
-        return {payload: decoded, expired: false};
+        const decoded = jwt.verify(token, publicKey, { algorithms: ['RS256'] });
+        return { payload: decoded, expired: false };
     } catch (e) {
-        return {payload: null, expired: true};
+        return { payload: null, expired: true };
     }
 }
