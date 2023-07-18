@@ -66,3 +66,6 @@ Injeksi data source ke dalam controllernya masing-masing yang mengatur sebuah at
 |--------------------------------------------------------|----------|----|
 | B03 - Single Service Implementation                    | &check;  |    |
 | B08 - SOLID                                            | &check;  |    |
+
+## **Extras**
+This is a link to the monolith repository [click here!](https://github.com/NicholasLiem/OHL_Monolith)
