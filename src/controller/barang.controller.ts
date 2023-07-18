@@ -78,9 +78,9 @@ export class BarangController {
         return ResponseUtil.sendResponseBarangArray(res, 200, 'Barang found', barangData);
       }
       
-      // Case: Perusahaan Name given & Search String null
+      // Case: Perusahaan Id given & Search String null
       if (perusahaanString && !searchString) {
-        const perusahaanEntity = await findPerusahaanByName(perusahaanString, this.perusahaanRepository);
+        const perusahaanEntity = await findPerusahaanById(perusahaanString, this.perusahaanRepository);
         if (!perusahaanEntity) {
           return ResponseUtil.sendError(res, 404, 'Perusahaan not found', req.query);
         }
@@ -88,7 +88,7 @@ export class BarangController {
         const barangData = await this.barangRepository
           .createQueryBuilder('barang')
           .leftJoinAndSelect('barang.perusahaan', 'perusahaan')
-          .where('perusahaan.nama = :perusahaanString', { perusahaanString })
+          .where('perusahaan.id = :perusahaanString', { perusahaanString })
           .getMany();
 
         return ResponseUtil.sendResponseBarangArray(res, 200, 'Barang found', barangData);
@@ -133,7 +133,7 @@ export class BarangController {
         return ResponseUtil.sendError(res, 404, 'Perusahaan not found', req.body);
       }
 
-      if (!nama || !harga || !stok || !kode) {
+      if (nama == null || harga == null || stok == null || kode == null || perusahaan_id == null) {
         return ResponseUtil.sendError(res, 400, 'Barang data is not complete', req.body);
       }
 
