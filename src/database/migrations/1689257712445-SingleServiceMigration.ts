@@ -6,9 +6,24 @@ import { UserModel } from "../../models/user.model"
 export class SingleServiceMigration1689257712445 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {
+        
         const perusahaanRepository = queryRunner.manager.getRepository(Perusahaan);
         const barangRepository = queryRunner.manager.getRepository(Barang);
         const userRepository = queryRunner.manager.getRepository(UserModel);
+
+        const perusahaan_1 = new Perusahaan(
+            "PT. Indofood Technologies",
+            "08123456789",
+            "PTI",
+            "Jl. Raya Bogor");
+        await perusahaanRepository.insert(perusahaan_1);
+
+        const perusahaan_2 = new Perusahaan(
+            "PT. Hyundai Technologies",
+            "08123456789",
+            "PHT",
+            "Jl. Raya Bogor");
+        await perusahaanRepository.insert(perusahaan_2);
 
         for (let i = 1; i <= 10; i++) {
         const perusahaanCode = this.generateRandomCode(3);

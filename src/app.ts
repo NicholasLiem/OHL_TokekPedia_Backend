@@ -1,12 +1,12 @@
 import express from 'express'
-import config from 'config'
 import routes from './routes'
 import postgresSetup from './utils/postgres.connect'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
+import dotEnv from 'dotenv'
 
 const app = express()
-const port = config.get<number>('port')
+dotEnv.config()
 
 app.use(express.json());
 app.use(cookieParser());
@@ -16,18 +16,17 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-
 (async () => {
   try {
-    const db = await postgresSetup()
-    routes(app, db)
+    const db = await postgresSetup();
+    routes(app, db);
 
-    app.listen(port, () => {
-      console.log(`Server is running on port ${port}`)
+    app.listen(process.env.PORT || 8080, () => {
+      console.log(`Server listening on port ${process.env.PORT || 3000}`)
     });
-    
+  
   } catch (error) {
     console.error('Failed to initialize Postgres:', error)
     process.exit(1)
   }
-})()
+})();

@@ -1,3 +1,4 @@
+"use strict";
 module.exports = {
     'dbHost': "db",
     'dbPort': 5432,
@@ -5,4 +6,4 @@ module.exports = {
     'dbPassword': 'niko',
     'dbDatabase': 'databarang',
     'port': 3000
-}
+};
