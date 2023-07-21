@@ -109,5 +109,4 @@ export class SessionController {
         name: userEntity.name,
     })
   }
-  
 }

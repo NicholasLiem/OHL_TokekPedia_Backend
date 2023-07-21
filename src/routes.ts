@@ -103,7 +103,29 @@ function routes(app: Express, db: DataSource) {
    *    tags: 
    *      - Barang
    *    description: Get all barang
-   */
+   *    parameters:
+   *      - in: query
+   *        name: q
+   *        required: false
+   *        type: string
+   *      - in: query
+   *        name: perusahaan
+   *        required: false
+   *        type: string
+   *    responses:
+   *      200:
+   *        description: Sucess
+   *        content:
+   *          application/json:
+   *            schema:
+   *              $ref: '#/components/schemas/SuccessBarangResponse'
+   *      500:
+   *        description: Error
+   *        content:
+   *          application/json: 
+   *            schema:
+   *              $ref: '#/components/schemas/FailedToSearchResponse'
+   */     
   app.get('/barang', (req, res) => {
     barangController.searchBarang(req, res);
   });
@@ -127,30 +149,136 @@ function routes(app: Express, db: DataSource) {
    *          application/json:
    *            schema:
    *              $ref: '#/components/schemas/SuccessBarangResponse'
-   */
+   *      404:
+   *        description: Error
+   *        content:
+   *          application/json: 
+   *            schema:
+   *              $ref: '#/components/schemas/FailedToSearchBarangResponse'
+   */    
   app.get('/barang/:id', (req, res) => {
     barangController.getBarang(req, res);
   });
 
   /**
-   * Belom
-   */
+   * @openapi
+   * '/barang/{id}':
+   *  put:
+   *    tags: 
+   *      - Barang
+   *    description: Update barang to the database
+   *    parameters:
+   *      - name: id
+   *        in: path
+   *        description: barang id
+   *        required: true
+   *    security:
+   *      - BearerAuth: []
+   *    requestBody:
+   *      required: true
+   *      content:
+   *        application/json:
+   *          schema:
+   *            $ref: '#/components/schemas/CreateBarangRequest'
+   *    responses:
+   *      200:
+   *        description: Success
+   *        content:
+   *          application/json:
+   *            schema:
+   *              $ref: '#/components/schemas/SuccessBarangResponse'
+   *      401:
+   *        description: Token Error / No Token
+   *        content:
+   *          application/json:
+   *            schema:
+   *              $ref: '#/components/schemas/InvalidTokenResponse'
+   *      404:
+   *        description: Error
+   *        content:
+   *          application/json: 
+   *            schema:
+   *              $ref: '#/components/schemas/FailedToSearchBarangResponse'
+   */    
   app.put('/barang/:id', checkToken, (req, res) => {
     barangController.updateBarang(req, res);
   });
 
   /**
-   * Belom
-   */
+   * @openapi
+   * '/barang/{id}':
+   *  delete:
+   *    tags: 
+   *      - Barang
+   *    description: Delete barang from database
+   *    parameters:
+   *      - name: id
+   *        in: path
+   *        description: barang id
+   *        required: true
+   *    security:
+   *      - BearerAuth: []
+   *    responses:
+   *      200:
+   *        description: Success
+   *        content:
+   *          application/json:
+   *            schema:
+   *              $ref: '#/components/schemas/SuccessBarangResponse'
+   *      401:
+   *        description: Token Error / No Token
+   *        content:
+   *          application/json:
+   *            schema:
+   *              $ref: '#/components/schemas/InvalidTokenResponse'
+   *      404:
+   *        description: Error
+   *        content:
+   *          application/json: 
+   *            schema:
+   *              $ref: '#/components/schemas/FailedToSearchBarangResponse'
+   */    
   app.delete('/barang/:id', checkToken, (req, res) => {
     barangController.deleteBarangById(req, res);
   });
 
   // Route for managing perusahaan
   /**
-   * Belom
-   */
-  app.post('/perusahaan', checkToken, (req, res) => {
+   * @openapi
+   * '/perusahaan':
+   *  post:
+   *    tags: 
+   *      - Perusahaan
+   *    description: Adding perusahaan to the database
+   *    security:
+   *      - BearerAuth: []
+   *    requestBody:
+   *      required: true
+   *      content:
+   *        application/json:
+   *          schema:
+   *            $ref: '#/components/schemas/CreatePerusahaanRequest'
+   *    responses:
+   *      200:
+   *        description: Success
+   *        content:
+   *          application/json:
+   *            schema:
+   *              $ref: '#/components/schemas/SuccessPerusahaanResponse'
+   *      401:
+   *        description: Token Error / No Token
+   *        content:
+   *          application/json:
+   *            schema:
+   *              $ref: '#/components/schemas/InvalidTokenResponse'
+   *      404:
+   *        description: Error
+   *        content:
+   *          application/json: 
+   *            schema:
+   *              $ref: '#/components/schemas/FailedToSearchPerusahaanResponse'
+   */      
+    app.post('/perusahaan', checkToken, (req, res) => {
     perusahaanController.createPerusahaan(req, res);
   });
 
@@ -164,7 +292,17 @@ function routes(app: Express, db: DataSource) {
    *    responses:
    *      200:
    *        description: Success
-   */
+   *        content:
+   *          application/json:
+   *            schema:
+   *              $ref: '#/components/schemas/SuccessPerusahaanResponse'
+   *      404:
+   *        description: Error
+   *        content:
+   *          application/json: 
+   *            schema:
+   *              $ref: '#/components/schemas/FailedToSearchPerusahaanResponse'
+   */     
   app.get('/perusahaan', (req, res) => {
     perusahaanController.searchPerusahaan(req, res);
   });
@@ -184,22 +322,94 @@ function routes(app: Express, db: DataSource) {
    *    responses:
    *      200:
    *        description: Success
+   *        content:
+   *          application/json:
+   *            schema:
+   *              $ref: '#/components/schemas/SuccessPerusahaanResponse'
    *      404:
    *        description: Error
-   */
+   *        content:
+   *          application/json: 
+   *            schema:
+   *              $ref: '#/components/schemas/FailedToSearchPerusahaanResponse'
+   */     
   app.get('/perusahaan/:id', (req, res) => {
     perusahaanController.getPerusahaanById(req, res);
   });
 
   /**
-   * Belom
+   * @openapi
+   * '/perusahaan/{id}':
+   *  put:
+   *    tags:
+   *      - Perusahaan
+   *    description: Update perusahaan to the database
+   *    parameters:
+   *      - name: id
+   *        in: path
+   *        description: perusahaan id
+   *        required: true
+   *    requestBody:
+   *      required: true
+   *      content:
+   *        application/json:
+   *          schema:
+   *            $ref: '#/components/schemas/CreatePerusahaanRequest'
+   *    responses:
+   *      200:
+   *        description: Success
+   *        content:
+   *          application/json:
+   *            schema:
+   *              $ref: '#/components/schemas/SuccessPerusahaanResponse'
+   *      401:
+   *        description: Token Error / No Token
+   *        content:
+   *          application/json:
+   *            schema:
+   *              $ref: '#/components/schemas/InvalidTokenResponse'
+   *      404:
+   *        description: Error
+   *        content:
+   *          application/json: 
+   *            schema:
+   *              $ref: '#/components/schemas/FailedToSearchPerusahaanResponse'  
    */
   app.put('/perusahaan/:id', checkToken, (req, res) => {
     perusahaanController.updatePerusahaan(req, res);
   });
 
   /**
-   * Belom
+   * @openapi
+   * '/perusahaan/{id}':
+   *  delete:
+   *    tags:
+   *      - Perusahaan
+   *    description: Delete perusahaan from database
+   *    parameters:
+   *      - name: id
+   *        in: path
+   *        description: perusahaan id
+   *        required: true
+   *    responses:
+   *      200:
+   *        description: Success
+   *        content:
+   *          application/json:
+   *            schema:
+   *              $ref: '#/components/schemas/SuccessPerusahaanResponse'
+   *      401:
+   *        description: Token Error / No Token
+   *        content:
+   *          application/json:
+   *            schema:
+   *              $ref: '#/components/schemas/InvalidTokenResponse'
+   *      404:
+   *        description: Error
+   *        content:
+   *          application/json: 
+   *            schema:
+   *              $ref: '#/components/schemas/FailedToSearchPerusahaanResponse'  
    */
   app.delete('/perusahaan/:id', checkToken, (req, res) => {
     perusahaanController.deletePerusahaanById(req, res);

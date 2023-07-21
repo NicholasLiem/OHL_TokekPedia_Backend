@@ -19,6 +19,58 @@ export class PerusahaanController {
     this.perusahaanRepository = this.db.getRepository(Perusahaan);
   }
 
+  /**
+   * @openapi
+   * components:
+   *  schemas:
+   *    CreatePerusahaanRequest:
+   *      type: object
+   *      required:
+   *        - nama
+   *        - harga
+   *        - stok
+   *        - perusahaan_id
+   *        - kode
+   *      properties:
+   *        nama:
+   *          type: string
+   *        alamat:
+   *          type: string
+   *        no_telp:
+   *          type: string
+   *        kode:
+   *          type: string
+   *    SuccessPerusahaanResponse:
+   *      type: object
+   *      properties:
+   *        status:
+   *          type: string
+   *          default: success
+   *        message:
+   *          type: string
+   *        data:
+   *          type: object
+   *          properties:
+   *            nama:
+   *              type: string
+   *            alamat:
+   *              type: string
+   *            no_telp:
+   *              type: string
+   *            kode:
+   *              type: string
+   *    FailedToSearchPerusahaanResponse:
+   *      type: object
+   *      properties:
+   *        status:
+   *          type: string
+   *          default: error
+   *        message:
+   *          type: string
+   *        data:
+   *          type: null
+   *          nullable: true
+   */
   async createPerusahaan(req: Request, res: Response): Promise<Response> {
     const { nama, alamat, no_telp, kode } = req.body;
 

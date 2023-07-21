@@ -60,6 +60,17 @@ export class BarangController {
    *              type: string
    *            kode:
    *              type: string
+   *    FailedToSearchBarangResponse:
+   *      type: object
+   *      properties:
+   *        status:
+   *          type: string
+   *          default: error
+   *        message:
+   *          type: string
+   *        data:
+   *          type: null
+   *          nullable: true
    */
   async createBarang(req: Request, res: Response): Promise<Response> {
     const { nama, harga, stok, perusahaan_id, kode } = req.body;
