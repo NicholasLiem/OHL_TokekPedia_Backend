@@ -2,6 +2,23 @@ import { Request, Response, NextFunction } from 'express';
 import { verifyJWT } from '../utils/jwt.utils';
 import { ResponseUtil } from '../utils/response.utils';
 
+/**
+ * @openapi
+ * components:
+ *  schemas:
+ *    InvalidTokenResponse:
+ *      type: object
+ *      properties:
+ *        status:
+ *          type: string
+ *          default: error
+ *        message:
+ *          type: string
+ *          default: Invalid token, no token
+ *        data:
+ *          type: null
+ *          nullable: true
+ */
 export function checkToken(req: Request, res: Response, next: NextFunction) {
   const token = req.headers.authorization;
 

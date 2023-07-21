@@ -11,6 +11,56 @@ export class SessionController {
     this.UserRepository = this.db.manager.getRepository(UserModel);
   }
 
+  /**
+   * @openapi
+   * components:
+   *  schemas:
+   *    LoginRequest:
+   *      type: object
+   *      required:
+   *        - username
+   *        - password
+   *      properties:
+   *        username: 
+   *          type: string
+   *          default: admin
+   *        password:
+   *          type: string
+   *          default: admin
+   *    LoginResponse:
+   *      type: object
+   *      properties:
+   *        status:
+   *          type: string
+   *          default: success
+   *        message:
+   *          type: string
+   *          default: Session created
+   *        data:
+   *          type: object
+   *          properties:
+   *            user:
+   *              type: object
+   *              properties:
+   *                username:
+   *                  type: string
+   *                name:
+   *                  type: string
+   *            token:
+   *              type: string
+   *    InvalidCredentialsResponse:
+   *      type: object
+   *      properties:
+   *        status:
+   *          type: string
+   *          default: error
+   *        message:
+   *          type: string
+   *          default: Invalid username or password
+   *        data:
+   *          type: null
+   *          nullable: true
+   */
   async createSessionHandler(req: Request, res: Response): Promise<Response> {
     const { username, password } = req.body;
     const userEntity = await this.UserRepository.findOne({

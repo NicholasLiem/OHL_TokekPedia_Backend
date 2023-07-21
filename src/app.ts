@@ -4,6 +4,7 @@ import postgresSetup from './utils/postgres.connect'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import dotEnv from 'dotenv'
+import { swaggerDocs } from './utils/swagger.utils'
 
 const app = express()
 dotEnv.config()
@@ -19,6 +20,8 @@ app.use(cors({
 (async () => {
   try {
     const db = await postgresSetup();
+    swaggerDocs(app, 3000);
+
     routes(app, db);
 
     app.listen(process.env.PORT || 8080, () => {

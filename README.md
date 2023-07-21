@@ -64,8 +64,12 @@ Injeksi data source ke dalam controllernya masing-masing yang mengatur sebuah at
 ## **Bonus Report**
 | Features                                               | Yes      | No |
 |--------------------------------------------------------|----------|----|
+| B02 - Deployment                                       | &check;  |    |
 | B03 - Single Service Implementation                    | &check;  |    |
+| B07 - Dokumentasi API (Swagger)                        | &check;  |    |
 | B08 - SOLID                                            | &check;  |    |
 
 ## **Extras**
-This is a link to the monolith repository [click here!](https://github.com/NicholasLiem/OHL_Monolith)
+- This is a link to the swagger api docs: 
+- This is a link to the monolith repository [click here!](https://github.com/NicholasLiem/OHL_Monolith)
+- Amazon EC2 service is used for this backend service and am using Neon.Tech service to deploy my PostgresSQL server. You can interact with the API through this public IPv4 address:

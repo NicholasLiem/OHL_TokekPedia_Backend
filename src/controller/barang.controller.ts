@@ -14,6 +14,53 @@ export class BarangController {
     this.perusahaanRepository = this.db.getRepository(Perusahaan);
   }
 
+  /**
+   * @openapi
+   * components:
+   *  schemas:
+   *    CreateBarangRequest:
+   *      type: object
+   *      required:
+   *        - nama
+   *        - harga
+   *        - stok
+   *        - perusahaan_id
+   *        - kode
+   *      properties:
+   *        nama:
+   *          type: string
+   *        harga:
+   *          type: number
+   *        stok:
+   *          type: number
+   *        perusahaan_id:
+   *          type: string
+   *        kode:
+   *          type: string
+   *    SuccessBarangResponse:
+   *      type: object
+   *      properties:
+   *        status:
+   *          type: string
+   *          default: success
+   *        message:
+   *          type: string
+   *        data:
+   *          type: object
+   *          properties:
+   *            id:
+   *              type: string
+   *            nama:
+   *              type: string
+   *            harga:
+   *              type: number
+   *            stok:
+   *              type: number
+   *            perusahaan_id:
+   *              type: string
+   *            kode:
+   *              type: string
+   */
   async createBarang(req: Request, res: Response): Promise<Response> {
     const { nama, harga, stok, perusahaan_id, kode } = req.body;
 
