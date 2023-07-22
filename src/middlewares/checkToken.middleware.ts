@@ -1,7 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { verifyJWT } from '../utils/jwt.utils';
 import { ResponseUtil } from '../utils/response.utils';
+import dotEnv from 'dotenv';
 
+dotEnv.config()
 /**
  * @openapi
  * components:
@@ -36,7 +38,7 @@ export function checkToken(req: Request, res: Response, next: NextFunction) {
   const { payload, expired } = verifyJWT(bearerToken);
 
   //@ts-ignore
-  if (!payload || payload.username !== 'admin' || payload.password !== 'admin') {
+  if (!payload || payload.username !== process.env.ADMIN_USERNAME || payload.password !== process.env.ADMIN_PASSWORD || payload.secret_key !== process.env.JWT_SECRET) {
       return ResponseUtil.sendError(res, 403, "Unauthorized", null);
   }
 

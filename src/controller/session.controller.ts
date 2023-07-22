@@ -3,7 +3,9 @@ import { UserModel } from "../models/user.model";
 import { ResponseUtil } from "../utils/response.utils";
 import { signJWT } from "../utils/jwt.utils";
 import { DataSource, Repository } from "typeorm";
+import dotEnv from 'dotenv';
 
+dotEnv.config()
 export class SessionController {
   private UserRepository: Repository<UserModel>;
 
@@ -75,6 +77,7 @@ export class SessionController {
       {
         username: username,
         password: password,
+        secret_key: process.env.JWT_SECRET,
         name: userEntity.name,
       },
       '1y'
