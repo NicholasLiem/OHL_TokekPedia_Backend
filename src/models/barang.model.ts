@@ -25,7 +25,7 @@ export class Barang {
 
   constructor(nama: string, harga: number, stok: number, perusahaan: Perusahaan, kode: string) {
     this.nama = nama;
-    this.harga = Math.max(harga, 0);
+    this.harga = Math.max(harga, 1);
     this.stok = Math.max(stok, 0);
     this.perusahaan = perusahaan;
     this.kode = kode;
