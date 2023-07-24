@@ -20,7 +20,7 @@ export class Barang {
   @ManyToOne(() => Perusahaan, perusahaan => perusahaan.barangs)
   perusahaan: Perusahaan;
 
-  @Column()
+  @Column({nullable: false, unique: true})
   kode: string
 
   constructor(nama: string, harga: number, stok: number, perusahaan: Perusahaan, kode: string) {

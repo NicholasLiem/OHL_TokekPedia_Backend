@@ -15,7 +15,7 @@ export class Perusahaan {
   @Column()
   no_telp: string;
 
-  @Column()
+  @Column({nullable: false, unique: true})
   kode: string
 
   @OneToMany(() => Barang, barang => barang.perusahaan, {cascade: true})
