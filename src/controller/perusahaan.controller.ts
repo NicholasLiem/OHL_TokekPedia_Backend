@@ -150,6 +150,11 @@ export class PerusahaanController {
         return ResponseUtil.sendError(res, 400, 'Request body is incomplete', req.body);
       }
 
+      const existingPerusahaanByKode = await this.perusahaanRepository.findOne({ where: { kode } });
+      if (existingPerusahaanByKode) {
+        return ResponseUtil.sendError(res, 400, 'Perusahaan with the same kode already exists', existingPerusahaanByKode);
+      }
+
       perusahaanEntity.nama = nama;
       perusahaanEntity.alamat = alamat;
       perusahaanEntity.no_telp = no_telp;
