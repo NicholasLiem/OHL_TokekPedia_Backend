@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Check } from 'typeor
 import { Perusahaan } from './perusahaan.model';
 
 @Entity()
-@Check(`"harga" >= 0`)
+@Check(`"harga" > 0`)
 @Check(`"stok" >= 0`)
 export class Barang {
   @PrimaryGeneratedColumn('uuid')
