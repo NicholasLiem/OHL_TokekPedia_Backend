@@ -72,4 +72,4 @@ Injeksi data source ke dalam controllernya masing-masing yang mengatur sebuah at
 ## **Extras**
 - This is a link to the swagger api docs: https://app.swaggerhub.com/apis-docs/13521135/single-service_api_docs/1.0.0
 - This is a link to the monolith repository [click here!](https://github.com/NicholasLiem/OHL_Monolith)
-- Amazon EC2 service is used for this backend service and am using Neon.Tech service to deploy my PostgresSQL server. You can interact with the API through this public IPv4 address:
+- Amazon EC2 service is used for this backend service and am using Supabase service to deploy my PostgresSQL server. You can interact with the API through this public IPv4 address: http://13.215.48.98:3000/
