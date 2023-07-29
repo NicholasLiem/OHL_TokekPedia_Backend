@@ -11,12 +11,19 @@ https://github.com/NicholasLiem/SingleService.git
 ```sh
 cd SingleService
 ```
-3. Make a new .env file based on .env.example (you can just remove .example from the file's name)
-4. Build and run your docker containers
+3. Build and run your docker containers
 ```sh
 docker-compose up --build
 ```
-5. (Docker Networking) Please look at this [monolith repository!](https://github.com/NicholasLiem/OHL_Monolith)
+4. Make a new .env file based on .env.example (you can just remove .example from the file's name)
+5. If for some reason the database is not seeded, you can manually seed using
+```sh
+docker exec -it single_service_app bash
+```
+```sh
+yarn migration:run
+```
+6. (Docker Networking) Please look at this [monolith repository!](https://github.com/NicholasLiem/OHL_Monolith)
 
 ## **Design Patterns**
 1. Model-Controller Pattern (Architectural) <br>
