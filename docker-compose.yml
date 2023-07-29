@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  app:
+  single_service_app:
     build:
       context: .
       dockerfile: Dockerfile
@@ -9,6 +9,8 @@ services:
       - '3000:3000'
     depends_on:
       - db
+    networks:
+      - app-network
 
   db:
     build:
@@ -16,7 +18,9 @@ services:
       dockerfile: Dockerfile.postgres
     ports:
       - '5432:5432'
+    networks:
+      - app-network
 
-volumes:
-  db:
-    driver: local
+networks:
+  app-network:
+    driver: bridge

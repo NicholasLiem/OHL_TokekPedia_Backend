@@ -11,10 +11,13 @@ https://github.com/NicholasLiem/SingleService.git
 ```sh
 cd SingleService
 ```
-3. Build and run your docker containers
+3. Make a new .env file based on .env.example (you can just remove .example from the file's name)
+4. Build and run your docker containers
 ```sh
 docker-compose up --build
 ```
+5. (Docker Networking) Please look at this [monolith repository!](https://github.com/NicholasLiem/OHL_Monolith)
+
 ## **Design Patterns**
 1. Model-Controller Pattern (Architectural) <br>
 Secara struktur, backend service ini memiliki tiga buah model, yakni barang, perusahaan, dan user. Masing-masing dari model ini memiliki controller-nya masing-masing. Perlu diperhatikan bahwa karena ini adalah backend service jadi tidak ada view. Hal ini mempermudah pengaturan model-model dalam satu handler/controllernya masing-masing sehingga kode jadi lebih reusable.
