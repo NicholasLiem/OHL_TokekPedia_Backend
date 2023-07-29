@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   single_service_app:
+    container_name: single_service_app
     build:
       context: .
       dockerfile: Dockerfile
