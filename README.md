@@ -68,7 +68,7 @@ Tidak ada inheritence yang digunakan dalam repository ini.
 4. Interface Segregation <br>
 Setiap controller mengimplementasi method-method yang diperlukan untuk fungsionalitasnya. Tidak ada controller yang dipaksa untuk mengimplementasi method-method yang tidak diperlukan.
 
-5. Dependency Injection <br>
+5. Dependency Inversion <br>
 Injeksi data source ke dalam controllernya masing-masing yang mengatur sebuah atau beberapa repository.
 
 ## **Bonus Report**
@@ -82,4 +82,4 @@ Injeksi data source ke dalam controllernya masing-masing yang mengatur sebuah at
 ## **Extras**
 - This is a link to the swagger api docs: https://app.swaggerhub.com/apis-docs/13521135/single-service_api_docs/1.0.0
 - This is a link to the monolith repository [click here!](https://github.com/NicholasLiem/OHL_Monolith)
-- Amazon EC2 service is used for this backend service and am using Supabase service to deploy my PostgresSQL server. You can interact with the API through this public IPv4 address: http://18.143.73.221:3000 (use http instead of https)
+- Amazon EC2 service is used for this backend service and am using Supabase service to deploy my PostgresSQL server. You can interact with the API through this public IPv4 address: N/A (use http instead of https)
